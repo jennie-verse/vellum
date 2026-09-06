@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; font-src 'self'; media-src 'self' blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Vellum</title>
+<meta name="description" content="Trace a photo on paper using the camera.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#EFB3C1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vellum">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <video class="camera" id="camera" playsinline autoplay muted></video>
+  <div class="photo-wrap" id="photo-wrap" hidden>
+    <img class="photo" id="photo" alt="Reference photo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+  </div>
+  <div class="scrim-top" aria-hidden="true"></div>
+</div>
+
+<div class="screen" id="screen-start">
+  <div class="screen-card">
+    <h1 class="screen-title">Vellum</h1>
+    <p class="screen-text">Put the device on a stand above your paper, then turn the camera on.</p>
+    <button class="btn btn-primary btn-wide" id="btn-start" type="button">Start</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-denied" hidden>
+  <div class="screen-card">
+    <p class="screen-head">Camera access is off</p>
+    <p class="screen-text">Vellum shows your paper through the camera. Allow camera access, then try again.</p>
+    <p class="screen-hint">Settings &rarr; Apps &rarr; Safari &rarr; Settings for Websites &rarr; Camera &rarr; Allow</p>
+    <button class="btn btn-primary btn-wide" id="btn-retry-denied" type="button">Retry</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-error" hidden>
+  <div class="screen-card">
+    <p class="screen-head">The camera stopped</p>
+    <p class="screen-text" id="error-text">Something interrupted the camera.</p>
+    <button class="btn btn-primary btn-wide" id="btn-retry-error" type="button">Retry</button>
+  </div>
+</div>
+
+<div class="screen screen-quiet" id="screen-resume" hidden>
+  <button class="btn btn-primary btn-float" id="btn-resume" type="button">Tap to resume camera</button>
+</div>
+
+<div class="screen screen-quiet" id="screen-nophoto" hidden>
+  <button class="btn btn-primary btn-float" id="btn-choose" type="button">Choose a photo</button>
+</div>
+
+<div class="controls" id="controls" hidden>
+  <button class="collapse" id="btn-collapse" type="button" aria-label="Hide controls" aria-expanded="true" aria-controls="control-body"><span class="chev" aria-hidden="true">&#9660;</span></button>
+  <div class="control-body" id="control-body">
+    <div class="row row-opacity">
+      <span class="lbl" id="opacity-label">Opacity</span>
+      <input class="slider" id="opacity" type="range" min="0" max="100" step="1" value="45" aria-labelledby="opacity-label">
+      <span class="readout" id="opacity-value" aria-live="polite">45%</span>
+      <span class="badge" id="hidden-badge" hidden>Photo hidden</span>
+    </div>
+    <div class="row row-buttons">
+      <button class="btn" id="btn-photo" type="button">Photo</button>
+      <button class="btn" id="btn-fit" type="button" disabled>Fit</button>
+      <button class="btn btn-lock" id="btn-lock" type="button" aria-pressed="false" disabled><span class="lock-dot" aria-hidden="true"></span><span id="lock-text">Lock</span></button>
+      <button class="btn btn-icon" id="btn-settings" type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings"><span aria-hidden="true">&#9881;</span></button>
+      <button class="btn btn-danger" id="btn-clear" type="button" disabled>Clear</button>
+    </div>
+  </div>
+</div>
+
+<button class="expand" id="btn-expand" type="button" aria-label="Show controls" hidden><span aria-hidden="true">&#9650;</span></button>
+
+<div class="sheet" id="settings" hidden role="dialog" aria-modal="true" aria-labelledby="settings-title">
+  <div class="sheet-inner">
+    <div class="sheet-head">
+      <h2 class="sheet-title" id="settings-title">Settings</h2>
+      <button class="btn btn-icon" id="btn-settings-close" type="button" aria-label="Close settings"><span aria-hidden="true">&#215;</span></button>
+    </div>
+
+    <section class="field">
+      <h3 class="field-title">Text size</h3>
+      <div class="steps" id="size-steps" role="group" aria-label="Text size">
+        <button class="step" type="button" data-step="1" aria-pressed="false">6</button>
+        <button class="step" type="button" data-step="2" aria-pressed="false">8</button>
+        <button class="step" type="button" data-step="3" aria-pressed="false">10</button>
+        <button class="step" type="button" data-step="4" aria-pressed="true">12</button>
+        <button class="step" type="button" data-step="5" aria-pressed="false">14</button>
+        <button class="step" type="button" data-step="6" aria-pressed="false">17</button>
+      </div>
+      <button class="btn btn-quiet" id="btn-size-reset" type="button">Reset</button>
+    </section>
+
+    <section class="field">
+      <h3 class="field-title">Keep screen on</h3>
+      <div class="switch-row">
+        <button class="switch" id="btn-wake" type="button" role="switch" aria-checked="true" aria-labelledby="wake-title"><span class="knob" aria-hidden="true"></span></button>
+        <span class="switch-label" id="wake-title">Keeps the screen awake while you draw</span>
+      </div>
+      <p class="field-note" id="wake-note" hidden>Not supported on this device.</p>
+    </section>
+
+    <section class="field">
+      <h3 class="field-title">About</h3>
+      <p class="field-note">Vellum &middot; App version <span id="about-version">2026.09.05-initial</span></p>
+      <p class="field-note">Everything runs on this device. The camera view is never recorded or sent anywhere, and the app works without a network.</p>
+      <p class="field-note">The saved photo is a convenience, not a backup. iOS can clear it when storage runs low.</p>
+      <p class="field-note" id="about-repo-fallback">Source repository: shown after GitHub Pages deployment.</p>
+      <p class="field-note" id="about-repo-wrap" hidden><a id="about-repo" href="" target="_blank" rel="noopener"></a></p>
+    </section>
+  </div>
+</div>
+
+<div class="sheet sheet-confirm" id="confirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="confirm-head" aria-describedby="confirm-text">
+  <div class="confirm-inner">
+    <p class="confirm-head" id="confirm-head">Replace photo?</p>
+    <p class="confirm-text" id="confirm-text">The current photo and its alignment are discarded.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-wide" id="confirm-cancel" type="button">Cancel</button>
+      <button class="btn btn-danger btn-wide" id="confirm-ok" type="button">Replace</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<input id="file-input" type="file" accept="image/*" hidden>
+
+<script src="js/version.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
