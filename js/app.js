@@ -802,39 +802,6 @@
 
   /* ---------------- start-up ---------------- */
 
-  /* One-time fresh start: this build is treated as a first release, so wipe
-     Vellum's own storage once. Only keys under the "vellum." localStorage
-     prefix and the "vellum" IndexedDB database are touched — there is no
-     shared/v1 sync namespace in this app to worry about. Gated on VERSION so
-     it never repeats after the first load of this build. */
-  function freshStartReset() {
-    var MARK = LS + "resetVersion";
-    var already;
-    try { already = window.localStorage.getItem(MARK); } catch (e) { return Promise.resolve(); }
-    if (already === VERSION) { return Promise.resolve(); }
-
-    try {
-      var toRemove = [];
-      for (var i = 0; i < window.localStorage.length; i++) {
-        var key = window.localStorage.key(i);
-        if (key && key.indexOf(LS) === 0) { toRemove.push(key); }
-      }
-      toRemove.forEach(function (key) { window.localStorage.removeItem(key); });
-    } catch (e) { /* private mode or full; nothing more to do */ }
-
-    return new Promise(function (resolve) {
-      if (!window.indexedDB || !window.indexedDB.deleteDatabase) { resolve(); return; }
-      var req;
-      try { req = window.indexedDB.deleteDatabase("vellum"); }
-      catch (e) { resolve(); return; }
-      req.onsuccess = function () { resolve(); };
-      req.onerror = function () { resolve(); };
-      req.onblocked = function () { resolve(); };
-    })["finally"](function () {
-      try { window.localStorage.setItem(MARK, VERSION); } catch (e) { /* ignore */ }
-    });
-  }
-
   function restoreSettings() {
     var step = Number(lsGet("step"));
     if (SIZE_STEPS[step]) { state.step = step; }
@@ -853,7 +820,7 @@
     if (raw) {
       try {
         var t = JSON.parse(raw);
-        if (isFinite(t.tx) && isFinite(t.ty) && isFinite(t.scale)) {
+        if (Number.isFinite(t.tx) && Number.isFinite(t.ty) && Number.isFinite(t.scale)) {
           state.tx = t.tx;
           state.ty = t.ty;
           state.scale = clamp(t.scale, MIN_SCALE, MAX_SCALE);
@@ -926,7 +893,8 @@
     measureBottomUi();
     registerWorker();
 
-    freshStartReset().then(function () {
+    // Restoring an app update must never discard the saved photo or alignment.
+    Promise.resolve().then(function () {
       restoreSettings();
       applySize();
       applyOpacity();
