@@ -208,3 +208,10 @@ curl -fsSI https://jennie-verse.github.io/vellum/
 - Service Worker를 통한 오프라인 앱 재실행: 통과.
 - 실제 iPhone/iPad Safari, iCloud 공유, 실제 비공개 GitHub 데이터 동기화: 실기기 확인 필요.
 - 카메라 검증은 Chromium 가상 카메라를 사용했으며 실제 카메라 권한·기기 거치 환경은 별도 확인 필요.
+
+## 2026-11-12 폴더블(iPhone Duo)·Mac 최적화 검증
+
+- 변경: 760px 이상에서 컨트롤 바 폭 제한(가운데 정렬)·설정 시트 가운데 대화상자화, 마우스 hover 표시(Mac, fine pointer만), 더블탭 지연 제거, 당겨서 출렁임 제거. 카메라는 계속 전체 화면 cover. 빌드 `2026.11.12-foldable1`.
+- 로컬 회귀 검사·문법 검사: 통과.
+- Chromium(가상 카메라) 360×780(접힘) / 840×760 / 1000×700(펼침) / 1440×900(Mac): 가로 넘침 없음, 콘솔 오류 없음, 창 크기 변경 시 카메라 cover 유지 확인.
+- 실제 iPhone Duo 접기·펼치기 전환은 사용자가 quill 앱에서만 확인했고, 이 앱은 **실기기 확인 필요**.

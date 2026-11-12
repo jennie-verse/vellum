@@ -63,7 +63,7 @@ vellum/
 `js/version.js` 한 줄입니다.
 
 ```js
-self.VELLUM_VERSION = "2026.09.08-data-safety";
+self.VELLUM_VERSION = "2026.11.12-foldable1";
 ```
 
 이 값을 올리면 세 가지가 함께 따라갑니다.

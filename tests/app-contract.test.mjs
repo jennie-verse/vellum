@@ -102,3 +102,15 @@ test("startup preserves the saved photo and settings across application upgrades
   assert.match(app, /restoreSettings\(\)/);
   assert.match(app, /return restorePhoto\(\)/);
 });
+
+test("foldable/Mac layout: wide-width rules, fine-pointer hover only, build stamp pinned", async () => {
+  const [css, version, html] = await Promise.all([read("css/app.css"), read("js/version.js"), read("index.html")]);
+  assert.match(css, /overscroll-behavior: none/);
+  assert.match(css, /touch-action: manipulation/);
+  assert.match(css, /@media \(min-width: 760px\)[\s\S]*calc\(50% - 380px\)/);
+  assert.match(css, /@media \(hover: hover\) and \(pointer: fine\)/);
+  // The camera must keep covering the window when it is resized.
+  assert.match(css, /\.camera \{[^}]*object-fit: cover/);
+  assert.match(version, /"2026\.11\.12-foldable1"/);
+  assert.ok(html.includes('id="about-version">2026.11.12-foldable1<'));
+});

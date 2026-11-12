@@ -42,7 +42,10 @@
 
 * { box-sizing: border-box; }
 
-html { height: 100%; }
+html { height: 100%; overscroll-behavior: none; }
+
+/* No double-tap delay or double-tap zoom on controls (pinch is unchanged). */
+button, input, label, summary, a { touch-action: manipulation; }
 
 body {
   margin: 0;
@@ -609,6 +612,59 @@ body {
 }
 
 .toast[hidden] { display: none; }
+
+/* ---------- foldable (iPhone Duo) unfolded and Mac wide windows ---------- */
+/* Width-based only, so folding/unfolding while the app is open just reflows.
+   The camera stays full-bleed (object-fit: cover); only the UI is constrained. */
+@media (min-width: 760px) {
+  .controls {
+    padding-left: max(calc(var(--sal) + 10px), calc(50% - 380px));
+    padding-right: max(calc(var(--sar) + 10px), calc(50% - 380px));
+    background: transparent;
+    border-top: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .sheet { align-items: center; }
+
+  .sheet-inner {
+    max-width: 560px;
+    border-radius: 18px;
+    padding-bottom: 16px;
+    border: 1px solid var(--line);
+  }
+
+  .screen-card { max-width: 400px; }
+  .confirm-inner { max-width: 400px; }
+}
+
+@media (min-width: 760px) {
+  .controls::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: max(0px, calc(50% - 380px));
+    right: max(0px, calc(50% - 380px));
+    z-index: -1;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: 16px 16px 0 0;
+    background: rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+}
+
+/* Mouse / trackpad (Mac) only; nothing depends on hover. */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled):not(.btn-primary) { background: var(--rose-tint); }
+  .btn-primary:hover:not(:disabled) { border-color: var(--rose-deep); }
+  .step:hover { background: var(--rose-tint); }
+  .step[aria-pressed="true"]:hover { background: var(--rose); }
+  .collapse:hover, .expand:hover { background: var(--rose-tint); }
+}
 
 /* ---------- motion ---------- */
 
