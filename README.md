@@ -3,7 +3,7 @@
 Vellum은 iPhone·폴더블(iPhone Duo)·iPad 또는 Mac Safari의 카메라 화면 위에 사진을 반투명하게 겹쳐, 실제 종이 위에서 그림을 따라 그릴 수 있게 하는 정적 PWA입니다.
 
 - 공개 앱: https://jennie-verse.github.io/vellum/
-- 버전: 2026.11.12-foldable1
+- 버전: 2026.11.12-foldable2
 - 배포: GitHub Pages Actions (`.github/workflows/deploy.yml`)
 - 서버·로그인·분석·외부 CDN 없음
 - 카메라 영상은 기기 안에서 화면에만 표시되며 저장하거나 전송하지 않음

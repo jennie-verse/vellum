@@ -613,10 +613,11 @@ body {
 
 .toast[hidden] { display: none; }
 
-/* ---------- foldable (iPhone Duo) unfolded and Mac wide windows ---------- */
-/* Width-based only, so folding/unfolding while the app is open just reflows.
+/* ---------- tablet portrait / unfolded foldable / Mac (tier A) ---------- */
+/* Unfolded iPhone Duo portrait is 669x951; folded landscape (678x466) is too short
+   and keeps the phone layout. No side rails here (tier B, if any, would be wider). Width/height based only, so folding/unfolding while the app is open just reflows.
    The camera stays full-bleed (object-fit: cover); only the UI is constrained. */
-@media (min-width: 760px) {
+@media (min-width: 640px) and (min-height: 560px) {
   .controls {
     padding-left: max(calc(var(--sal) + 10px), calc(50% - 380px));
     padding-right: max(calc(var(--sar) + 10px), calc(50% - 380px));
@@ -626,7 +627,10 @@ body {
     backdrop-filter: none;
   }
 
-  .sheet { align-items: center; }
+  .sheet {
+    align-items: center;
+    padding: var(--sat) 0 var(--sab);
+  }
 
   .sheet-inner {
     max-width: 560px;
@@ -639,7 +643,7 @@ body {
   .confirm-inner { max-width: 400px; }
 }
 
-@media (min-width: 760px) {
+@media (min-width: 640px) and (min-height: 560px) {
   .controls::before {
     content: "";
     position: absolute;

@@ -4,4 +4,4 @@
      - app.js registers the worker as "service-worker.js?v=<VERSION>" so iOS
        always notices the update, and shows the value in Settings > About
    Nothing else needs editing. */
-self.VELLUM_VERSION = "2026.11.12-foldable1";
+self.VELLUM_VERSION = "2026.11.12-foldable2";

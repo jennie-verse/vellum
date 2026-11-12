@@ -107,10 +107,12 @@ test("foldable/Mac layout: wide-width rules, fine-pointer hover only, build stam
   const [css, version, html] = await Promise.all([read("css/app.css"), read("js/version.js"), read("index.html")]);
   assert.match(css, /overscroll-behavior: none/);
   assert.match(css, /touch-action: manipulation/);
-  assert.match(css, /@media \(min-width: 760px\)[\s\S]*calc\(50% - 380px\)/);
+  assert.ok(css.includes("@media (min-width: 640px) and (min-height: 560px)"));
+  assert.doesNotMatch(css, /@media \(min-width: 7[0-9]{2}px\)/);
+  assert.match(css, /@media \(min-width: 640px\) and \(min-height: 560px\)[\s\S]*calc\(50% - 380px\)/);
   assert.match(css, /@media \(hover: hover\) and \(pointer: fine\)/);
   // The camera must keep covering the window when it is resized.
   assert.match(css, /\.camera \{[^}]*object-fit: cover/);
-  assert.match(version, /"2026\.11\.12-foldable1"/);
-  assert.ok(html.includes('id="about-version">2026.11.12-foldable1<'));
+  assert.match(version, /"2026\.11\.12-foldable2"/);
+  assert.ok(html.includes('id="about-version">2026.11.12-foldable2<'));
 });
